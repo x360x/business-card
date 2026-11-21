@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Greenleaf Media · Business Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0B0D0C;
+    --cream: #F4EFE6;
+    --cream-soft: #A39E93; /* Warm muted grey */
+    --leaf: #7CC142;
+    --leaf-deep: #4E8A26;
+    --line: rgba(244, 239, 230, 0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #08090A;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 3rem 2rem 6rem;
+    color: var(--cream);
+  }
+
+  /* ============ CONTROLS ============ */
+  .controls {
+    margin-bottom: 3rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    background: rgba(255,255,255,0.03);
+    padding: 0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    flex-wrap: wrap;
+    justify-content: center;
+    position: sticky;
+    top: 1rem;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .toggle-btn {
+    background: transparent;
+    color: var(--cream-soft);
+    border: none;
+    padding: 0.6rem 1.6rem;
+    border-radius: 999px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .toggle-btn.active {
+    background: var(--cream);
+    color: #0B0D0C;
+  }
+
+  .toggle-btn:hover:not(.active) { color: var(--cream); }
+
+  .download-group { display: flex; gap: 0.5rem; margin-left: 0.5rem; flex-wrap: wrap; }
+
+  .download-btn {
+    background: var(--leaf);
+    color: #06120a;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 999px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 6px 24px rgba(124, 193, 66, 0.2);
+  }
+
+  .download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px rgba(124, 193, 66, 0.3);
+    background: #8fd453;
+  }
+
+  .download-btn.secondary {
+    background: transparent;
+    color: var(--cream);
+    border: 1px solid var(--line);
+    box-shadow: none;
+  }
+
+  .download-btn.secondary:hover {
+    background: rgba(244, 239, 230, 0.08);
+    border-color: var(--cream);
+    box-shadow: none;
+  }
+
+  .download-btn.pdf {
+    background: #C8A96A; /* Elegant gold for PDF */
+    color: #0B0D0C;
+    box-shadow: 0 6px 24px rgba(200, 169, 106, 0.2);
+  }
+  .download-btn.pdf:hover {
+    background: #D9BE85;
+    box-shadow: 0 10px 32px rgba(200, 169, 106, 0.3);
+  }
+
+  /* ============ CARD WRAPPER ============ */
+  .card-stage {
+    position: relative;
+    display: none;
+  }
+  .card-stage.active { display: block; }
+
+  .card {
+    width: 1050px;
+    height: 600px;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.8), 0 0 0 1px var(--line);
+    margin-bottom: 2.5rem;
+  }
+
+  /* Subtle grain overlay */
+  .card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  /* =========================================
+     FRONT — Editorial minimal, cream on ink
+     ========================================= */
+  .card-front {
+    background: var(--ink);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 70px 80px;
+  }
+
+  /* Elegant large leaf watermark */
+  .front-deco {
+    position: absolute;
+    right: -40px;
+    top: -40px;
+    width: 400px;
+    height: 400px;
+    opacity: 0.04;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .front-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    z-index: 2;
+  }
+
+  .brand-mark {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .brand-mark svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .brand-word {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    color: var(--cream);
+  }
+  .brand-name em { font-style: italic; color: var(--leaf); }
+
+  .brand-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--cream-soft);
+    margin-top: 8px;
+  }
+
+  .front-est {
+    text-align: right;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--cream-soft);
+    line-height: 1.8;
+  }
+  .front-est strong { color: var(--leaf); font-weight: 600; letter-spacing: 0.25em; }
+
+  .front-main {
+    max-width: 720px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .front-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 4.2rem;
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--cream);
+    margin-bottom: 14px;
+  }
+  .front-name em { font-style: italic; color: var(--cream-soft); }
+
+  /* Tightly coupled role text */
+  .front-role {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    color: var(--cream-soft);
+    text-transform: uppercase;
+  }
+
+  .front-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-top: 26px;
+    border-top: 1px solid var(--line);
+    position: relative;
+    z-index: 2;
+  }
+
+  .front-contact { display: flex; gap: 40px; }
+
+  .contact-block h5 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--leaf);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .contact-block p {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    color: var(--cream);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    line-height: 1.5;
+  }
+
+  .front-loc {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--cream-soft);
+    text-align: right;
+  }
+  .front-loc strong { color: var(--cream); display: block; font-weight: 500; margin-bottom: 4px; }
+
+  /* =========================================
+     BACK — Cream, editorial mono type stack
+     ========================================= */
+  .card-back {
+    background: var(--cream);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 70px 80px;
+    color: var(--ink);
+  }
+
+  .back-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    z-index: 2;
+  }
+
+  .back-statement {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    line-height: 1.2;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    max-width: 540px;
+  }
+  .back-statement em { font-style: italic; color: var(--leaf-deep); }
+
+  .back-mono {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0.6;
+    text-align: right;
+    line-height: 1.9;
+    font-weight: 600;
+  }
+
+  .back-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-top: 26px;
+    border-top: 1px solid rgba(11, 13, 12, 0.12);
+    position: relative;
+    z-index: 2;
+  }
+
+  .back-contact {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .back-contact span {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .back-contact span::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--leaf-deep);
+  }
+
+  .back-web {
+    text-align: right;
+    font-family: 'Inter', sans-serif;
+  }
+  .back-web .domain {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .back-web .handle {
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0.6;
+    font-weight: 600;
+  }
+
+  /* ============ SPEC LINE ============ */
+  .spec {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cream-soft);
+    text-align: center;
+    margin-top: 0.5rem;
+    opacity: 0.5;
+  }
+
+  @media (max-width: 1200px) {
+    .card { transform: scale(0.75); transform-origin: top center; margin-bottom: -120px; }
+  }
+  @media (max-width: 900px) {
+    .card { transform: scale(0.55); margin-bottom: -260px; }
+  }
+  @media (max-width: 600px) {
+    .card { transform: scale(0.38); margin-bottom: -360px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="controls">
+    <button class="toggle-btn active" onclick="switchSide('front')">Front</button>
+    <button class="toggle-btn" onclick="switchSide('back')">Back</button>
+    <div class="download-group">
+      <button class="download-btn" id="downloadBtn">PNG</button>
+      <button class="download-btn pdf" id="downloadPdfBtn">PDF (Print)</button>
+      <button class="download-btn secondary" id="downloadBothBtn">Both Sides</button>
+    </div>
+  </div>
+
+  <!-- ==================== FRONT ==================== -->
+  <div class="card-stage active" id="frontStage">
+    <div class="card card-front" id="cardFront">
+      
+      <!-- Beautiful Leaf Watermark -->
+      <svg class="front-deco" viewBox="0 0 200 200" fill="none">
+        <path d="M 100,10 C 180,50 190,150 100,190 C 10,150 20,50 100,10 Z" stroke="var(--cream)" stroke-width="1" fill="none"/>
+        <path d="M 100,10 C 100,60 100,140 100,190" stroke="var(--cream)" stroke-width="0.5" fill="none"/>
+        <path d="M 100,50 C 140,70 160,110 160,150" stroke="var(--cream)" stroke-width="0.5" fill="none"/>
+        <path d="M 100,50 C 60,70 40,110 40,150" stroke="var(--cream)" stroke-width="0.5" fill="none"/>
+      </svg>
+
+      <div class="front-top">
+        <div class="brand-mark">
+          <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M25 75 C 25 40, 60 25, 85 15 C 85 45, 65 75, 25 75 Z" stroke="#7CC142" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M25 75 C 40 60, 55 45, 85 15" stroke="#7CC142" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="70" cy="30" r="3" fill="#7CC142"/>
+          </svg>
+          <div class="brand-word">
+            <span class="brand-name">Femi <em>Greenleaf</em></span>
+            <span class="brand-sub">Greenleaf Media Productions</span>
+          </div>
+        </div>
+        <div class="front-est">
+          <strong>EST. LAGOS</strong><br />
+          Visual · Motion · Story
+        </div>
+      </div>
+
+      <div class="front-main">
+        <h1 class="front-name">Femi <em>Ekundayo</em></h1>
+        <p class="front-role">Creative Director · Visual Storyteller</p>
+      </div>
+
+      <div class="front-bottom">
+        <div class="front-contact">
+          <div class="contact-block">
+            <h5>Email</h5>
+            <p>hello@femigreenleaf.com</p>
+          </div>
+        </div>
+        <div class="front-loc">
+          <strong>Worldwide</strong>
+        </div>
+      </div>
+    </div>
+    <div class="spec">3.5 × 2.0 in · 300 DPI · CMYK-safe colors · bleed-ready</div>
+  </div>
+
+  <!-- ==================== BACK ==================== -->
+  <div class="card-stage" id="backStage">
+    <div class="card card-back" id="cardBack">
+      <div class="back-top">
+        <h2 class="back-statement">
+          Great visual storytelling is not just about what people <em>see.</em> It's about what they <em>feel</em>, understand and remember.
+        </h2>
+        <div class="back-mono">
+          GREENLEAF<br />
+          MEDIA<br />
+          PRODUCTIONS
+        </div>
+      </div>
+
+      <div class="back-bottom">
+        <div class="back-contact">
+          <span>WhatsApp +234 813 081 6373</span>
+          <span>Film</span>
+          <span>Photo</span>
+          <span>Sound</span>
+          <span>Visual Art</span>
+        </div>
+        <div class="back-web">
+          <div class="domain">femigreenleaf.com</div>
+          <div class="handle">@femi_greenleaf</div>
+        </div>
+      </div>
+    </div>
+    <div class="spec">3.5 × 2.0 in · 300 DPI · CMYK-safe colors · bleed-ready</div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    let currentSide = 'front';
+
+    function switchSide(side) {
+      currentSide = side;
+      const frontStage = document.getElementById('frontStage');
+      const backStage = document.getElementById('backStage');
+      const btns = document.querySelectorAll('.toggle-btn');
+
+      btns.forEach(b => b.classList.remove('active'));
+      if (side === 'front') {
+        frontStage.classList.add('active');
+        backStage.classList.remove('active');
+        btns[0].classList.add('active');
+      } else {
+        backStage.classList.add('active');
+        frontStage.classList.remove('active');
+        btns[1].classList.add('active');
+      }
+    }
+
+    async function renderCard(id) {
+      const el = document.getElementById(id);
+      return await html2canvas(el, {
+        scale: 4, 
+        backgroundColor: id === 'cardFront' ? '#0B0D0C' : '#F4EFE6',
+        useCORS: true,
+        logging: false
+      });
+    }
+
+    function downloadCanvas(canvas, name) {
+      const link = document.createElement('a');
+      link.download = name;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // PNG Download
+    document.getElementById('downloadBtn').addEventListener('click', async function() {
+      const btn = this;
+      const original = btn.textContent;
+      btn.textContent = 'Generating…';
+      btn.disabled = true;
+      try {
+        const id = currentSide === 'front' ? 'cardFront' : 'cardBack';
+        const canvas = await renderCard(id);
+        downloadCanvas(canvas, `Greenleaf-BusinessCard-${currentSide}.png`);
+      } catch (e) {
+        console.error(e);
+        alert('Could not generate image. Please try again.');
+      } finally {
+        btn.textContent = original;
+        btn.disabled = false;
+      }
+    });
+
+    // PDF Download (Print Ready)
+    document.getElementById('downloadPdfBtn').addEventListener('click', async function() {
+      const btn = this;
+      const original = btn.textContent;
+      btn.textContent = 'Generating PDF…';
+      btn.disabled = true;
+      try {
+        const id = currentSide === 'front' ? 'cardFront' : 'cardBack';
+        const canvas = await renderCard(id);
+        
+        const { jsPDF } = window.jspdf;
+        // Standard business card size in mm: 88.9 x 50.8 (with bleed it's usually 91 x 61)
+        // We'll use standard trim size 3.5 x 2.0 inches = 88.9 x 50.8 mm
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+          format: [88.9, 50.8]
+        });
+        
+        const imgData = canvas.toDataURL('image/png');
+        pdf.addImage(imgData, 'PNG', 0, 0, 88.9, 50.8);
+        pdf.save(`Greenleaf-BusinessCard-${currentSide}-PRINT.pdf`);
+      } catch (e) {
+        console.error(e);
+        alert('Could not generate PDF. Please try again.');
+      } finally {
+        btn.textContent = original;
+        btn.disabled = false;
+      }
+    });
+
+    // Both Sides Download
+    document.getElementById('downloadBothBtn').addEventListener('click', async function() {
+      const btn = this;
+      const original = btn.textContent;
+      btn.textContent = 'Generating…';
+      btn.disabled = true;
+      try {
+        const front = await renderCard('cardFront');
+        downloadCanvas(front, 'Greenleaf-BusinessCard-front.png');
+        await new Promise(r => setTimeout(r, 300));
+        const back = await renderCard('cardBack');
+        downloadCanvas(back, 'Greenleaf-BusinessCard-back.png');
+      } catch (e) {
+        console.error(e);
+        alert('Could not generate images. Please try again.');
+      } finally {
+        btn.textContent = original;
+        btn.disabled = false;
+      }
+    });
+  </script>
+
+</body>
+</html>
